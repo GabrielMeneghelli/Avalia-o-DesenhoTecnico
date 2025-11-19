@@ -157,6 +157,78 @@
         " disabled>Baixar Tons de Cinza</button>
     </div>
 
+    <!-- Seção 6 -->
+    <h2>6º - Histograma RGB + Estatísticas</h2>
+
+    <div class="container">
+        <p>Histogramas dos canais R, G e B e estatísticas calculadas automaticamente.</p>
+
+        <div style="display:flex; flex-wrap:wrap; gap:20px;">
+            <div>
+                <h3>Histograma R</h3>
+                <canvas id="histR" width="300" height="150" style="background:white;"></canvas>
+                <p id="statsR"></p>
+            </div>
+
+            <div>
+                <h3>Histograma G</h3>
+                <canvas id="histG" width="300" height="150" style="background:white;"></canvas>
+                <p id="statsG"></p>
+            </div>
+
+            <div>
+                <h3>Histograma B</h3>
+                <canvas id="histB" width="300" height="150" style="background:white;"></canvas>
+                <p id="statsB"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção 7 -->
+    <h2>7º - Análise de Bits e Estrutura da Imagem</h2>
+
+    <div class="container">
+        <p>Informações sobre profundidade de cor, canais, dimensões e tamanho em memória.</p>
+
+        <p id="bitsInfo"></p>
+    </div>
+
+    <!-- Seção 8 -->
+    <h2>8º - Relatório Técnico</h2>
+
+    <div class="container">
+        <p>Gerar relatório técnico contendo todas as análises realizadas automaticamente.</p>
+
+        <button id="btnRelatorio" style="
+            margin-top: 15px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            background: #0e6b62;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        ">Gerar Relatório</button>
+
+        <button id="btnBaixarRelatorio" disabled style="
+            margin-top: 15px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            background: #0e6b62;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        ">Baixar PDF</button>
+
+        <div id="relatorio" style="
+            margin-top: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            display:none;
+        "></div>
+    </div>
 
     <script>
         const input = document.getElementById("imageInput");
@@ -196,6 +268,9 @@
                     converterParaWebp(preview, width, height);
                     gerarEspelhamento(preview, width, height);
                     gerarTonsDeCinza(preview, width, height);
+                    gerarHistograma(preview, width, height);
+                    analisarImagem(preview, width, height);
+
 
                 };
             };
@@ -340,6 +415,206 @@
             };
         }
 
+        /* ----------- 6. HISTOGRAMA RGB + ESTATÍSTICAS ----------- */
+        function gerarHistograma(img, w, h) {
+
+            const canvas = document.createElement("canvas");
+            canvas.width = w;
+            canvas.height = h;
+
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, w, h);
+
+            let imgData = ctx.getImageData(0, 0, w, h);
+            let data = imgData.data;
+
+            // Histograma com 256 posições
+            let histR = new Array(256).fill(0);
+            let histG = new Array(256).fill(0);
+            let histB = new Array(256).fill(0);
+
+            let valoresR = [], valoresG = [], valoresB = [];
+
+            // Preenchendo histogramas
+            for (let i = 0; i < data.length; i += 4) {
+                let r = data[i];
+                let g = data[i + 1];
+                let b = data[i + 2];
+
+                histR[r]++; histG[g]++; histB[b]++;
+                valoresR.push(r); valoresG.push(g); valoresB.push(b);
+            }
+
+            // Funções estatísticas
+            function calcularStats(valores) {
+                valores.sort((a, b) => a - b);
+                let min = valores[0];
+                let max = valores[valores.length - 1];
+
+                let media = valores.reduce((a, b) => a + b, 0) / valores.length;
+
+                let mediana = valores.length % 2 === 0 ?
+                    (valores[valores.length / 2 - 1] + valores[valores.length / 2]) / 2 :
+                    valores[Math.floor(valores.length / 2)];
+
+                let variancia = valores.reduce((acc, val) => acc + Math.pow(val - media, 2), 0) / valores.length;
+                let desvio = Math.sqrt(variancia);
+
+                return { min, max, media, mediana, desvio };
+            }
+
+            const statsR = calcularStats(valoresR);
+            const statsG = calcularStats(valoresG);
+            const statsB = calcularStats(valoresB);
+
+            // Escrever estatísticas na tela
+            document.getElementById("statsR").innerHTML =
+                `Min: ${statsR.min} | Max: ${statsR.max} | Média: ${statsR.media.toFixed(2)}
+                <br>Mediana: ${statsR.mediana} | Desvio-padrão: ${statsR.desvio.toFixed(2)}`;
+
+            document.getElementById("statsG").innerHTML =
+                `Min: ${statsG.min} | Max: ${statsG.max} | Média: ${statsG.media.toFixed(2)}
+                <br>Mediana: ${statsG.mediana} | Desvio-padrão: ${statsG.desvio.toFixed(2)}`;
+
+            document.getElementById("statsB").innerHTML =
+                `Min: ${statsB.min} | Max: ${statsB.max} | Média: ${statsB.media.toFixed(2)}
+                <br>Mediana: ${statsB.mediana} | Desvio-padrão: ${statsB.desvio.toFixed(2)}`;
+
+            // Função para desenhar histogramas
+            function desenharHistograma(id, histData, cor) {
+                const canvas = document.getElementById(id);
+                const ctxHist = canvas.getContext("2d");
+
+                ctxHist.clearRect(0, 0, canvas.width, canvas.height);
+
+                let maxValor = Math.max(...histData);
+
+                for (let i = 0; i < 256; i++) {
+                    let h = (histData[i] / maxValor) * canvas.height;
+
+                    ctxHist.fillStyle = cor;
+                    ctxHist.fillRect(i, canvas.height - h, 1, h);
+                }
+            }
+
+            desenharHistograma("histR", histR, "red");
+            desenharHistograma("histG", histG, "green");
+            desenharHistograma("histB", histB, "blue");
+        }
+
+        /* ----------- 7. ANÁLISE DE BITS E ESTRUTURA ----------- */
+        function analisarImagem(img, w, h) {
+
+            // Canvas para obter informações da imagem processada
+            const canvas = document.createElement("canvas");
+            canvas.width = w;
+            canvas.height = h;
+
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, w, h);
+
+            const imgData = ctx.getImageData(0, 0, w, h);
+
+            // Informações
+            const canais = 4; // R, G, B e Alpha (sempre ao usar getImageData)
+            const bitsPorCanal = 8;
+            const bitsPorPixel = canais * bitsPorCanal;
+            const tamanhoMemoria = imgData.data.length; // bytes do buffer RGBA
+
+            const txt = `
+                <strong>Profundidade de cor:</strong> ${bitsPorPixel} bits/pixel (${bitsPorCanal} bits por canal)<br>
+                <strong>Número de canais:</strong> ${canais} (R, G, B, A)<br>
+                <strong>Dimensões:</strong> ${w} × ${h} pixels<br>
+                <strong>Tamanho em memória:</strong> ${tamanhoMemoria} bytes
+            `;
+
+            document.getElementById("bitsInfo").innerHTML = txt;
+        }
+
+        /* ----------- 8. RELATÓRIO TÉCNICO ----------- */
+    document.getElementById("btnRelatorio").addEventListener("click", gerarRelatorio);
+
+    async function gerarRelatorio() {
+
+        const rel = document.getElementById("relatorio");
+        rel.style.display = "block";
+
+        const titulo = "<h2>Relatório Técnico — Processamento de Imagem</h2>";
+
+        const operacoes = `
+            <h3>1. Operações Implementadas</h3>
+            <ul>
+                <li>Carregamento e exibição da imagem</li>
+                <li>Redução da imagem (75%, 50%, 25%)</li>
+                <li>Conversão de formato para WEBP</li>
+                <li>Espelhamento vertical</li>
+                <li>Geração de imagem em tons de cinza</li>
+                <li>Histogramas RGB + estatísticas (mínimo, máximo, média, mediana, desvio-padrão)</li>
+                <li>Análise de estrutura da imagem (bits, canais, memória)</li>
+            </ul>
+        `;
+
+        const resultados = `
+            <h3>2. Resultados Gerados</h3>
+            <p><strong>Imagem Original:</strong></p>
+            <img src="${preview.src}" style="max-width:300px;"><br><br>
+
+            <p><strong>Reduções:</strong></p>
+            ${resultContainer.innerHTML}
+
+            <p><strong>Imagem WEBP:</strong></p>
+            <img src="${webpPreview.src}" style="max-width:300px;"><br><br>
+
+            <p><strong>Espelhamento Vertical:</strong></p>
+            <img src="${flipPreview.src}" style="max-width:300px;"><br><br>
+
+            <p><strong>Tons de Cinza:</strong></p>
+            <img src="${grayPreview.src}" style="max-width:300px;"><br><br>
+
+            <h4>Histogramas:</h4>
+            <p>Canal R:</p><canvas width="300" height="150">${document.getElementById("histR").toDataURL()}</canvas>
+            <p>Canal G:</p><canvas width="300" height="150">${document.getElementById("histG").toDataURL()}</canvas>
+            <p>Canal B:</p><canvas width="300" height="150">${document.getElementById("histB").toDataURL()}</canvas>
+
+            <p><strong>Estatísticas:</strong></p>
+            <p>R: ${document.getElementById("statsR").innerHTML}</p>
+            <p>G: ${document.getElementById("statsG").innerHTML}</p>
+            <p>B: ${document.getElementById("statsB").innerHTML}</p>
+
+            <h4>Estrutura da Imagem:</h4>
+            <p>${document.getElementById("bitsInfo").innerHTML}</p>
+        `;
+
+        const observacoes = `
+            <h3>3. Observações e Limitações</h3>
+            <ul>
+                <li>A análise é baseada na imagem renderizada no navegador e não no arquivo original bruto.</li>
+                <li>Todo processamento é feito via JavaScript usando HTML5 Canvas.</li>
+                <li>O histograma usa valores de 0 a 255 e pode ser afetado por compressões internas.</li>
+                <li>O tamanho em memória reflete a matriz RGBA expandida (4 bytes por pixel).</li>
+            </ul>
+        `;
+
+        const ferramentas = `
+            <h3>4. Ferramentas e Bibliotecas Utilizadas</h3>
+            <ul>
+                <li>HTML5 + CSS3</li>
+                <li>JavaScript puro</li>
+                <li>Canvas API (getImageData, putImageData, drawImage)</li>
+                <li>FileReader API</li>
+            </ul>
+        `;
+
+        rel.innerHTML = titulo + operacoes + resultados + observacoes + ferramentas;
+
+        // ativa botão PDF
+        document.getElementById("btnBaixarRelatorio").disabled = false;
+    }
+
+    /* ----- Baixar PDF usando impressão do navegador ----- */
+    document.getElementById("btnBaixarRelatorio").addEventListener("click", () => {
+        window.print();
+    });
     </script>
 
 </body>
