@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Visualizador de Imagem</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+        body {
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            margin: 50px;
+            background: #089c90;
+        }
+
+        h2 {
+            color: #1d1c1c;
+            font-style: italic;
+        }
+
+        label {
+            font-family: 'roboto';
+        }
+
+        .container {
+            margin-top: 20px;
+            background: #d3d3d3;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        img {
+            max-width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .result {
+            margin-top: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .result-item {
+            background: #d3d3d3;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .dim {
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            transition: 0.2s;
+        }
+        
+        button:hover {
+            opacity: 0.85;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="titleSite">
+        <h2 style="margin-left: 20px;">Trabalho de Desenho Técnico 2º termo - Engenharia da Computação</h2>
+        <ul style="list-style: none;">
+            <li>Arthur Romero Rossi</li>
+            <li>Gabriel Henrique Meneghelli da Silva</li>
+            <li>Maria Fernanda Pires de Oliveira</li>
+        </ul>
+    </div>
+
+    <!-- Seção 1 -->
+    <h2>1º - Carregar e Visualizar Imagem</h2>
+
+    <div class="container">
+        <label>Selecione uma imagem:</label><br>
+        <input type="file" id="imageInput" accept="image/png, image/jpeg, image/bmp">
+
+        <p id="dimensions"></p>
+        <img id="preview" src="" alt="">
+    </div>
+
+    <!-- Seção 2 -->
+    <h2>2º - Redução da Imagem (75%, 50%, 25%)</h2>
+
+    <div class="container">
+        <p>As reduções aparecerão automaticamente após selecionar a imagem.</p>
+        <div class="result" id="result"></div>
+    </div>
+
+    <!-- Seção 3 -->
+    <h2>3º - Conversão de Formato para WEBP</h2>
+
+    <div class="container">
+        <p><strong>Tamanho original:</strong> <span id="originalSize">---</span></p>
+        <p><strong>Tamanho WEBP:</strong> <span id="webpSize">---</span></p>
+
+        <img id="webpPreview" src="" alt="">
+
+        <button id="downloadWebp" style="
+            margin-top: 15px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            background: #0e6b62;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        " disabled>Baixar WEBP</button>
+    </div>
+
+    <!-- Seção 4 -->
+    <h2>4º - Operação Geométrica — Espelhamento Vertical</h2>
+
+    <div class="container">
+        <p>A imagem espelhada aparecerá abaixo automaticamente.</p>
+
+        <img id="flipPreview" src="" alt="">
+
+        <button id="downloadFlip" style="
+            margin-top: 15px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            background: #0e6b62;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        " disabled>Baixar Espelhamento</button>
+    </div>
+
+    <!-- Seção 5 -->
+    <h2>5º - Operação de Cores — Tons de Cinza</h2>
+
+    <div class="container">
+        <p>A imagem em tons de cinza aparecerá abaixo automaticamente.</p>
+
+        <img id="grayPreview" src="" alt="">
+
+        <button id="downloadGray" style="
+            margin-top: 15px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            background: #0e6b62;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        " disabled>Baixar Tons de Cinza</button>
+    </div>
+
+
+    <script>
+        const input = document.getElementById("imageInput");
+        const preview = document.getElementById("preview");
+        const dimensions = document.getElementById("dimensions");
+        const resultContainer = document.getElementById("result");
+
+        const originalSizeTxt = document.getElementById("originalSize");
+        const webpSizeTxt = document.getElementById("webpSize");
+        const webpPreview = document.getElementById("webpPreview");
+        const btnDownloadWebp = document.getElementById("downloadWebp");
+
+        const flipPreview = document.getElementById("flipPreview");
+        const btnDownloadFlip = document.getElementById("downloadFlip");
+
+        let originalFileSize = 0;
+
+        input.addEventListener("change", function () {
+            const file = this.files[0];
+            if (!file) return;
+
+            originalFileSize = file.size;
+            originalSizeTxt.textContent = formatBytes(originalFileSize);
+
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+
+                preview.onload = function () {
+                    const width = preview.naturalWidth;
+                    const height = preview.naturalHeight;
+
+                    dimensions.textContent = `Dimensões: ${width} x ${height} pixels`;
+
+                    gerarReducoes(preview, width, height);
+                    converterParaWebp(preview, width, height);
+                    gerarEspelhamento(preview, width, height);
+                    gerarTonsDeCinza(preview, width, height);
+
+                };
+            };
+
+            reader.readAsDataURL(file);
+        });
+
+        /* ----------- 2. Reduções ----------- */
+        function gerarReducoes(img, width, height) {
+            resultContainer.innerHTML = "";
+
+            const fatores = [
+                { nome: "75%", fator: 0.75 },
+                { nome: "50%", fator: 0.50 },
+                { nome: "25%", fator: 0.25 }
+            ];
+
+            fatores.forEach(item => {
+                const novoW = width * item.fator;
+                const novoH = height * item.fator;
+
+                const canvas = document.createElement("canvas");
+                canvas.width = novoW;
+                canvas.height = novoH;
+
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(img, 0, 0, novoW, novoH);
+
+                const newImg = document.createElement("img");
+                newImg.src = canvas.toDataURL("image/png");
+
+                const div = document.createElement("div");
+                div.className = "result-item";
+
+                const p = document.createElement("p");
+                p.className = "dim";
+                p.textContent = `Redução ${item.nome}: ${Math.round(novoW)} x ${Math.round(novoH)} pixels`;
+
+                div.appendChild(p);
+                div.appendChild(newImg);
+
+                resultContainer.appendChild(div);
+            });
+        }
+
+        /* ----------- 3. Converter para WEBP ----------- */
+        function converterParaWebp(img, w, h) {
+            const canvas = document.createElement("canvas");
+            canvas.width = w;
+            canvas.height = h;
+
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, w, h);
+
+            const webpData = canvas.toDataURL("image/webp", 0.8);
+
+            webpPreview.src = webpData;
+
+            const webpSize = Math.round((webpData.length * 3) / 4);
+            webpSizeTxt.textContent = formatBytes(webpSize);
+
+            btnDownloadWebp.disabled = false;
+            btnDownloadWebp.onclick = function () {
+                const a = document.createElement("a");
+                a.href = webpData;
+                a.download = "imagem_convertida.webp";
+                a.click();
+            };
+        }
+
+        /* ----------- 4. Espelhamento Vertical ----------- */
+        function gerarEspelhamento(img, w, h) {
+            const canvas = document.createElement("canvas");
+            canvas.width = w;
+            canvas.height = h;
+
+            const ctx = canvas.getContext("2d");
+
+            ctx.translate(w, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(img, 0, 0, w, h);
+
+            const flippedData = canvas.toDataURL("image/png");
+
+            flipPreview.src = flippedData;
+
+            btnDownloadFlip.disabled = false;
+            btnDownloadFlip.onclick = function () {
+                const a = document.createElement("a");
+                a.href = flippedData;
+                a.download = "imagem_espelhada.png";
+                a.click();
+            };
+        }
+
+        /* ----------- formatar tamanho ----------- */
+        function formatBytes(bytes) {
+            if (bytes < 1024) return bytes + " B";
+            else if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+            else return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+        }
+
+        /* ----------- 5. Tons de Cinza ----------- */
+        function gerarTonsDeCinza(img, w, h) {
+            const canvas = document.createElement("canvas");
+            canvas.width = w;
+            canvas.height = h;
+
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, w, h);
+
+            let imgData = ctx.getImageData(0, 0, w, h);
+            let data = imgData.data;
+
+            // Converter pixel por pixel
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i];
+                const g = data[i + 1];
+                const b = data[i + 2];
+
+                // fórmula luminance
+                const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+
+                data[i] = data[i + 1] = data[i + 2] = gray;
+            }
+
+            ctx.putImageData(imgData, 0, 0);
+
+            const grayData = canvas.toDataURL("image/png");
+
+            const grayPreview = document.getElementById("grayPreview");
+            const btnGray = document.getElementById("downloadGray");
+
+            grayPreview.src = grayData;
+            btnGray.disabled = false;
+
+            btnGray.onclick = function () {
+                const a = document.createElement("a");
+                a.href = grayData;
+                a.download = "imagem_tons_de_cinza.png";
+                a.click();
+            };
+        }
+
+    </script>
+
+</body>
+</html>
