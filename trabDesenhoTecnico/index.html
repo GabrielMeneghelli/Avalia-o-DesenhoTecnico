@@ -5,66 +5,214 @@
     <title>Visualizador de Imagem</title>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+    /* Importação da fonte Roboto */
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 
+    /* Variáveis CSS para cores e transições (facilita a manutenção) */
+    :root {
+        --cor-primaria: #101312; /* Verde Teal mais escuro para botões e destaque */
+        --cor-secundaria: #089c90; /* Verde Teal claro para o fundo */
+        --cor-fundo-card: #f8f8f8; /* Branco Sujo / Off-White */
+        --cor-texto-principal: #1f2937; /* Preto suave */
+        --cor-borda-cinza: #e5e7eb; /* Cinza claro para bordas e separadores */
+        --sombra-padrao: 0 4px 6px rgba(0, 0, 0, 0.08);
+        --transicao-padrao: 0.2s ease-in-out;
+    }
+
+    body {
+        font-family: 'Roboto', sans-serif;
+        margin: 0;
+        padding: 40px 20px; /* Padding no body em vez de margin */
+        background-color: var(--cor-secundaria);
+        color: var(--cor-texto-principal);
+        line-height: 1.6;
+    }
+
+    /* Estilização da área de cabeçalho (título do trabalho e nomes) */
+    #titleSite {
+        background: var(--cor-fundo-card);
+        padding: 20px 40px;
+        border-radius: 12px;
+        box-shadow: var(--sombra-padrao);
+        margin-bottom: 30px;
+        border-left: 8px solid var(--cor-primaria); /* Destaque visual */
+    }
+
+    h2 {
+        color: var(--cor-primaria);
+        font-style: normal; /* Removido o itálico para um visual mais limpo */
+        font-weight: 700;
+        border-bottom: 2px solid var(--cor-borda-cinza);
+        padding-bottom: 10px;
+        margin-top: 40px;
+    }
+    
+    #titleSite h2 {
+        color: var(--cor-texto-principal);
+        border-bottom: none;
+        margin-top: 0;
+        margin-left: 0 !important;
+    }
+
+    /* Lista de nomes */
+    #titleSite ul {
+        list-style: none;
+        padding: 0;
+        margin-top: 10px;
+        font-size: 0.95em;
+        color: #4b5563; /* Cinza mais escuro para o subtexto */
+        display: flex;
+        gap: 20px;
+    }
+    #titleSite li {
+        border-right: 1px solid var(--cor-borda-cinza);
+        padding-right: 20px;
+    }
+    #titleSite li:last-child {
+        border-right: none;
+        padding-right: 0;
+    }
+
+    label {
+        font-weight: 600;
+        color: var(--cor-texto-principal);
+        display: block; /* Garante que o label ocupe sua própria linha */
+        margin-bottom: 5px;
+    }
+
+    /* Contêiner principal para cada seção */
+    .container {
+        margin-top: 20px;
+        background-color: var(--cor-fundo-card);
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: var(--sombra-padrao);
+    }
+
+    img {
+        max-width: 100%;
+        height: auto;
+        border: 1px solid var(--cor-borda-cinza);
+        border-radius: 8px;
+        margin-top: 15px;
+        object-fit: contain; /* Garante que a imagem se ajuste sem cortar */
+        max-height: 400px; /* Limita a altura das prévias para não ficarem gigantes */
+        display: block;
+    }
+    
+    #preview {
+        max-height: 500px; /* Permite que a prévia principal seja um pouco maior */
+    }
+
+    /* Estilo para a pré-visualização de imagem e input de arquivo */
+    #imageInput {
+        padding: 8px;
+        border: 1px solid var(--cor-borda-cinza);
+        border-radius: 5px;
+        background-color: white;
+    }
+
+   .result {
+    margin-top: 20px;
+    display: grid;
+    /* Layout responsivo melhorado */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+    gap: 20px;
+}
+
+.result-item {
+    background: white; /* Fundo branco para os itens internos */
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Sombra mais suave */
+    border: 1px solid var(--cor-borda-cinza);
+    /* NOVO: Centraliza o conteúdo (as imagens reduzidas) */
+    text-align: center; 
+}
+
+.result-item img {
+    margin-top: 10px;
+    max-height: 200px; 
+    
+    /* A CORREÇÃO: Força a imagem a usar sua largura natural (a largura reduzida do canvas), 
+       e anula o 'max-width: 100%' da regra genérica. */
+    width: auto !important; 
+    display: inline-block; /* Garante que 'text-align: center' funcione */
+}
+    .dim {
+        font-size: 14px;
+        margin: 0 0 10px 0;
+        color: #6b7280; /* Cinza para informações secundárias */
+        font-weight: 400;
+    }
+
+    /* Estilo para todos os botões da página */
+    button {
+        margin-top: 15px;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        background-color: var(--cor-primaria);
+        color: white;
+        cursor: pointer;
+        font-weight: bold;
+        transition: var(--transicao-padrao);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    button:disabled {
+        background-color: #9ca3af; /* Cinza para desabilitado */
+        cursor: not-allowed;
+        box-shadow: none;
+    }
+
+    button:hover:not(:disabled) {
+        background-color: #0a4f49; /* Cor um pouco mais escura no hover */
+        transform: translateY(-1px); /* Pequeno efeito 3D */
+    }
+
+    /* Estilos para a seção de Histograma */
+    .container h3 {
+        color: var(--cor-primaria);
+        margin-top: 0;
+        font-weight: 500;
+        font-size: 1.1em;
+    }
+
+    #statsR, #statsG, #statsB, #bitsInfo {
+        font-size: 0.9em;
+        line-height: 1.5;
+        color: #4b5563;
+        margin-top: 10px;
+        background-color: white;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px dashed var(--cor-borda-cinza);
+    }
+    
+    #statsR strong, #statsG strong, #statsB strong {
+        color: var(--cor-texto-principal);
+    }
+    
+    canvas {
+        border: 1px solid var(--cor-borda-cinza) !important;
+        border-radius: 5px;
+    }
+    
+    @media (max-width: 600px) {
         body {
-            font-family: Verdana, Geneva, Tahoma, sans-serif;
-            margin: 50px;
-            background: #089c90;
+            padding: 20px 10px;
         }
-
-        h2 {
-            color: #1d1c1c;
-            font-style: italic;
+        #titleSite ul {
+            flex-direction: column;
+            gap: 5px;
         }
-
-        label {
-            font-family: 'roboto';
+        #titleSite li {
+            border-right: none;
+            padding-right: 0;
         }
-
-        .container {
-            margin-top: 20px;
-            background: #d3d3d3;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-
-        img {
-            max-width: 100%;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            margin-top: 10px;
-        }
-
-        .result {
-            margin-top: 30px;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-        }
-
-        .result-item {
-            background: #d3d3d3;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-
-        .dim {
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-
-        button {
-            transition: 0.2s;
-        }
-        
-        button:hover {
-            opacity: 0.85;
-        }
-
-    </style>
+    }
+</style>
 </head>
 <body>
 
@@ -191,43 +339,6 @@
         <p>Informações sobre profundidade de cor, canais, dimensões e tamanho em memória.</p>
 
         <p id="bitsInfo"></p>
-    </div>
-
-    <!-- Seção 8 -->
-    <h2>8º - Relatório Técnico</h2>
-
-    <div class="container">
-        <p>Gerar relatório técnico contendo todas as análises realizadas automaticamente.</p>
-
-        <button id="btnRelatorio" style="
-            margin-top: 15px;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 8px;
-            background: #0e6b62;
-            color: white;
-            cursor: pointer;
-            font-weight: bold;
-        ">Gerar Relatório</button>
-
-        <button id="btnBaixarRelatorio" disabled style="
-            margin-top: 15px;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 8px;
-            background: #0e6b62;
-            color: white;
-            cursor: pointer;
-            font-weight: bold;
-        ">Baixar PDF</button>
-
-        <div id="relatorio" style="
-            margin-top: 30px;
-            padding: 20px;
-            background: white;
-            border-radius: 10px;
-            display:none;
-        "></div>
     </div>
 
     <script>
@@ -530,91 +641,6 @@
 
             document.getElementById("bitsInfo").innerHTML = txt;
         }
-
-        /* ----------- 8. RELATÓRIO TÉCNICO ----------- */
-    document.getElementById("btnRelatorio").addEventListener("click", gerarRelatorio);
-
-    async function gerarRelatorio() {
-
-        const rel = document.getElementById("relatorio");
-        rel.style.display = "block";
-
-        const titulo = "<h2>Relatório Técnico — Processamento de Imagem</h2>";
-
-        const operacoes = `
-            <h3>1. Operações Implementadas</h3>
-            <ul>
-                <li>Carregamento e exibição da imagem</li>
-                <li>Redução da imagem (75%, 50%, 25%)</li>
-                <li>Conversão de formato para WEBP</li>
-                <li>Espelhamento vertical</li>
-                <li>Geração de imagem em tons de cinza</li>
-                <li>Histogramas RGB + estatísticas (mínimo, máximo, média, mediana, desvio-padrão)</li>
-                <li>Análise de estrutura da imagem (bits, canais, memória)</li>
-            </ul>
-        `;
-
-        const resultados = `
-            <h3>2. Resultados Gerados</h3>
-            <p><strong>Imagem Original:</strong></p>
-            <img src="${preview.src}" style="max-width:300px;"><br><br>
-
-            <p><strong>Reduções:</strong></p>
-            ${resultContainer.innerHTML}
-
-            <p><strong>Imagem WEBP:</strong></p>
-            <img src="${webpPreview.src}" style="max-width:300px;"><br><br>
-
-            <p><strong>Espelhamento Vertical:</strong></p>
-            <img src="${flipPreview.src}" style="max-width:300px;"><br><br>
-
-            <p><strong>Tons de Cinza:</strong></p>
-            <img src="${grayPreview.src}" style="max-width:300px;"><br><br>
-
-            <h4>Histogramas:</h4>
-            <p>Canal R:</p><canvas width="300" height="150">${document.getElementById("histR").toDataURL()}</canvas>
-            <p>Canal G:</p><canvas width="300" height="150">${document.getElementById("histG").toDataURL()}</canvas>
-            <p>Canal B:</p><canvas width="300" height="150">${document.getElementById("histB").toDataURL()}</canvas>
-
-            <p><strong>Estatísticas:</strong></p>
-            <p>R: ${document.getElementById("statsR").innerHTML}</p>
-            <p>G: ${document.getElementById("statsG").innerHTML}</p>
-            <p>B: ${document.getElementById("statsB").innerHTML}</p>
-
-            <h4>Estrutura da Imagem:</h4>
-            <p>${document.getElementById("bitsInfo").innerHTML}</p>
-        `;
-
-        const observacoes = `
-            <h3>3. Observações e Limitações</h3>
-            <ul>
-                <li>A análise é baseada na imagem renderizada no navegador e não no arquivo original bruto.</li>
-                <li>Todo processamento é feito via JavaScript usando HTML5 Canvas.</li>
-                <li>O histograma usa valores de 0 a 255 e pode ser afetado por compressões internas.</li>
-                <li>O tamanho em memória reflete a matriz RGBA expandida (4 bytes por pixel).</li>
-            </ul>
-        `;
-
-        const ferramentas = `
-            <h3>4. Ferramentas e Bibliotecas Utilizadas</h3>
-            <ul>
-                <li>HTML5 + CSS3</li>
-                <li>JavaScript puro</li>
-                <li>Canvas API (getImageData, putImageData, drawImage)</li>
-                <li>FileReader API</li>
-            </ul>
-        `;
-
-        rel.innerHTML = titulo + operacoes + resultados + observacoes + ferramentas;
-
-        // ativa botão PDF
-        document.getElementById("btnBaixarRelatorio").disabled = false;
-    }
-
-    /* ----- Baixar PDF usando impressão do navegador ----- */
-    document.getElementById("btnBaixarRelatorio").addEventListener("click", () => {
-        window.print();
-    });
     </script>
 
 </body>
