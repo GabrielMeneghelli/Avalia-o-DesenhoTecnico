@@ -1,345 +1,250 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Visualizador de Imagem</title>
+<meta charset="UTF-8">
+<title>Visualizador de Imagem — Glass UI</title>
 
-    <style>
-    /* Importação da fonte Roboto */
-    @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+<style>
+/* ------------------------------
+     ESTILO GLASSMORPHISM PREMIUM
+--------------------------------*/
 
-    /* Variáveis CSS para cores e transições (facilita a manutenção) */
-    :root {
-        --cor-primaria: #101312; /* Verde Teal mais escuro para botões e destaque */
-        --cor-secundaria: #089c90; /* Verde Teal claro para o fundo */
-        --cor-fundo-card: #f8f8f8; /* Branco Sujo / Off-White */
-        --cor-texto-principal: #1f2937; /* Preto suave */
-        --cor-borda-cinza: #e5e7eb; /* Cinza claro para bordas e separadores */
-        --sombra-padrao: 0 4px 6px rgba(0, 0, 0, 0.08);
-        --transicao-padrao: 0.2s ease-in-out;
-    }
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;600;700&display=swap');
 
-    body {
-        font-family: 'Roboto', sans-serif;
-        margin: 0;
-        padding: 40px 20px; /* Padding no body em vez de margin */
-        background-color: var(--cor-secundaria);
-        color: var(--cor-texto-principal);
-        line-height: 1.6;
-    }
+:root {
+    --glass-bg: rgba(255, 255, 255, 0.18);
+    --glass-border: rgba(255, 255, 255, 0.4);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+    --text-color: #ffffff;
+    --accent: #00f2ff;
+    --accent-strong: #00c0cc;
+}
 
-    /* Estilização da área de cabeçalho (título do trabalho e nomes) */
-    #titleSite {
-        background: var(--cor-fundo-card);
-        padding: 20px 40px;
-        border-radius: 12px;
-        box-shadow: var(--sombra-padrao);
-        margin-bottom: 30px;
-        border-left: 8px solid var(--cor-primaria); /* Destaque visual */
-    }
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #0b0f2f, #0f3b52, #0b0f2f);
+    color: var(--text-color);
+    backdrop-filter: blur(10px);
+}
 
-    h2 {
-        color: var(--cor-primaria);
-        font-style: normal; /* Removido o itálico para um visual mais limpo */
-        font-weight: 700;
-        border-bottom: 2px solid var(--cor-borda-cinza);
-        padding-bottom: 10px;
-        margin-top: 40px;
-    }
-    
-    #titleSite h2 {
-        color: var(--cor-texto-principal);
-        border-bottom: none;
-        margin-top: 0;
-        margin-left: 0 !important;
-    }
+/* ----------- CABEÇALHO ----------- */
+#titleSite {
+    background: var(--glass-bg);
+    backdrop-filter: blur(15px);
+    border-radius: 16px;
+    padding: 25px 40px;
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+}
 
-    /* Lista de nomes */
-    #titleSite ul {
-        list-style: none;
-        padding: 0;
-        margin-top: 10px;
-        font-size: 0.95em;
-        color: #4b5563; /* Cinza mais escuro para o subtexto */
-        display: flex;
-        gap: 20px;
-    }
-    #titleSite li {
-        border-right: 1px solid var(--cor-borda-cinza);
-        padding-right: 20px;
-    }
-    #titleSite li:last-child {
-        border-right: none;
-        padding-right: 0;
-    }
+#titleSite h2 {
+    margin: 0;
+    font-size: 1.5em;
+    font-weight: 600;
+}
 
-    label {
-        font-weight: 600;
-        color: var(--cor-texto-principal);
-        display: block; /* Garante que o label ocupe sua própria linha */
-        margin-bottom: 5px;
-    }
+#titleSite ul {
+    display: flex;
+    list-style: none;
+    gap: 20px;
+    margin-top: 12px;
+    padding: 0;
+    font-weight: 300;
+    opacity: 0.85;
+}
 
-    /* Contêiner principal para cada seção */
-    .container {
-        margin-top: 20px;
-        background-color: var(--cor-fundo-card);
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: var(--sombra-padrao);
-    }
+/* ----------- TÍTULOS DAS SEÇÕES ----------- */
+h2 {
+    margin-top: 45px;
+    font-size: 1.6em;
+    font-weight: 600;
+    color: var(--accent);
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+}
 
-    img {
-        max-width: 100%;
-        height: auto;
-        border: 1px solid var(--cor-borda-cinza);
-        border-radius: 8px;
-        margin-top: 15px;
-        object-fit: contain; /* Garante que a imagem se ajuste sem cortar */
-        max-height: 400px; /* Limita a altura das prévias para não ficarem gigantes */
-        display: block;
-    }
-    
-    #preview {
-        max-height: 500px; /* Permite que a prévia principal seja um pouco maior */
-    }
+/* ----------- CONTAINERS DE CONTEÚDO ----------- */
+.container {
+    margin-top: 20px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    padding: 30px;
+    border-radius: 18px;
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+}
 
-    /* Estilo para a pré-visualização de imagem e input de arquivo */
-    #imageInput {
-        padding: 8px;
-        border: 1px solid var(--cor-borda-cinza);
-        border-radius: 5px;
-        background-color: white;
-    }
+label {
+    font-weight: 400;
+}
 
-   .result {
+/* ----------- IMAGENS ----------- */
+img {
+    max-width: 100%;
+    border-radius: 14px;
+    margin-top: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+/* ----------- INPUT FILE ----------- */
+#imageInput {
+    margin-top: 12px;
+    padding: 10px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid var(--glass-border);
+    color: white;
+    cursor: pointer;
+}
+
+/* ----------- BOTÕES ----------- */
+button {
+    margin-top: 15px;
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+    color: black;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+    box-shadow: 0 0 10px rgba(0,255,255,0.4);
+}
+
+button:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(0,255,255,0.7);
+}
+
+button:disabled {
+    background: gray;
+    cursor: not-allowed;
+}
+
+/* ----------- REDUÇÕES ----------- */
+.result {
     margin-top: 20px;
     display: grid;
-    /* Layout responsivo melhorado */
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 20px;
 }
 
 .result-item {
-    background: white; /* Fundo branco para os itens internos */
+    background: rgba(255,255,255,0.12);
+    border: 1px solid var(--glass-border);
     padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Sombra mais suave */
-    border: 1px solid var(--cor-borda-cinza);
-    /* NOVO: Centraliza o conteúdo (as imagens reduzidas) */
-    text-align: center; 
+    border-radius: 12px;
+    box-shadow: var(--glass-shadow);
+    text-align: center;
 }
 
 .result-item img {
-    margin-top: 10px;
-    max-height: 200px; 
-    
-    /* A CORREÇÃO: Força a imagem a usar sua largura natural (a largura reduzida do canvas), 
-       e anula o 'max-width: 100%' da regra genérica. */
-    width: auto !important; 
-    display: inline-block; /* Garante que 'text-align: center' funcione */
+    width: auto !important;
+    max-height: 200px;
 }
-    .dim {
-        font-size: 14px;
-        margin: 0 0 10px 0;
-        color: #6b7280; /* Cinza para informações secundárias */
-        font-weight: 400;
-    }
 
-    /* Estilo para todos os botões da página */
-    button {
-        margin-top: 15px;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 6px;
-        background-color: var(--cor-primaria);
-        color: white;
-        cursor: pointer;
-        font-weight: bold;
-        transition: var(--transicao-padrao);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-    
-    button:disabled {
-        background-color: #9ca3af; /* Cinza para desabilitado */
-        cursor: not-allowed;
-        box-shadow: none;
-    }
+/* ----------- HISTOGRAMAS ----------- */
+canvas {
+    margin-top: 10px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid var(--glass-border);
+}
 
-    button:hover:not(:disabled) {
-        background-color: #0a4f49; /* Cor um pouco mais escura no hover */
-        transform: translateY(-1px); /* Pequeno efeito 3D */
-    }
+/* ----------- TEXTO DENTRO DOS CARDS ----------- */
+#statsR, #statsG, #statsB, #bitsInfo {
+    background: rgba(255,255,255,0.15);
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+}
 
-    /* Estilos para a seção de Histograma */
-    .container h3 {
-        color: var(--cor-primaria);
-        margin-top: 0;
-        font-weight: 500;
-        font-size: 1.1em;
-    }
-
-    #statsR, #statsG, #statsB, #bitsInfo {
-        font-size: 0.9em;
-        line-height: 1.5;
-        color: #4b5563;
-        margin-top: 10px;
-        background-color: white;
-        padding: 10px;
-        border-radius: 5px;
-        border: 1px dashed var(--cor-borda-cinza);
-    }
-    
-    #statsR strong, #statsG strong, #statsB strong {
-        color: var(--cor-texto-principal);
-    }
-    
-    canvas {
-        border: 1px solid var(--cor-borda-cinza) !important;
-        border-radius: 5px;
-    }
-    
-    @media (max-width: 600px) {
-        body {
-            padding: 20px 10px;
-        }
-        #titleSite ul {
-            flex-direction: column;
-            gap: 5px;
-        }
-        #titleSite li {
-            border-right: none;
-            padding-right: 0;
-        }
-    }
 </style>
 </head>
 <body>
 
-    <div id="titleSite">
-        <h2 style="margin-left: 20px;">Trabalho de Desenho Técnico 2º termo - Engenharia da Computação</h2>
-        <ul style="list-style: none;">
-            <li>Arthur Romero Rossi</li>
-            <li>Gabriel Henrique Meneghelli da Silva</li>
-            <li>Maria Fernanda Pires de Oliveira</li>
-        </ul>
-    </div>
+<!-- CABEÇALHO -->
+<div id="titleSite">
+    <h2>Trabalho de Desenho Técnico — Engenharia da Computação</h2>
+    <ul>
+        <li>Arthur Romero Rossi</li>
+        <li>Gabriel Henrique Meneghelli</li>
+        <li>Maria Fernanda Pires de Oliveira</li>
+    </ul>
+</div>
 
-    <!-- Seção 1 -->
-    <h2>1º - Carregar e Visualizar Imagem</h2>
+<!-- SEÇÃO 1 -->
+<h2>1º — Carregar e Visualizar Imagem</h2>
+<div class="container">
+    <label>Selecione uma imagem:</label>
+    <input type="file" id="imageInput" accept="image/png, image/jpeg, image/bmp">
 
-    <div class="container">
-        <label>Selecione uma imagem:</label><br>
-        <input type="file" id="imageInput" accept="image/png, image/jpeg, image/bmp">
+    <p id="dimensions"></p>
+    <img id="preview" src="">
+</div>
 
-        <p id="dimensions"></p>
-        <img id="preview" src="" alt="">
-    </div>
+<!-- SEÇÃO 2 -->
+<h2>2º — Redução da Imagem (75%, 50%, 25%)</h2>
+<div class="container">
+    <p>As reduções aparecerão automaticamente após selecionar a imagem.</p>
+    <div class="result" id="result"></div>
+</div>
 
-    <!-- Seção 2 -->
-    <h2>2º - Redução da Imagem (75%, 50%, 25%)</h2>
+<!-- SEÇÃO 3 -->
+<h2>3º — Conversão de Formato para WEBP</h2>
+<div class="container">
+    <p><strong>Tamanho original:</strong> <span id="originalSize">---</span></p>
+    <p><strong>Tamanho WEBP:</strong> <span id="webpSize">---</span></p>
 
-    <div class="container">
-        <p>As reduções aparecerão automaticamente após selecionar a imagem.</p>
-        <div class="result" id="result"></div>
-    </div>
+    <img id="webpPreview">
+    <button id="downloadWebp" disabled>Baixar WEBP</button>
+</div>
 
-    <!-- Seção 3 -->
-    <h2>3º - Conversão de Formato para WEBP</h2>
+<!-- SEÇÃO 4 -->
+<h2>4º — Espelhamento Vertical</h2>
+<div class="container">
+    <p>A imagem espelhada aparecerá abaixo automaticamente.</p>
+    <img id="flipPreview">
+    <button id="downloadFlip" disabled>Baixar Espelhamento</button>
+</div>
 
-    <div class="container">
-        <p><strong>Tamanho original:</strong> <span id="originalSize">---</span></p>
-        <p><strong>Tamanho WEBP:</strong> <span id="webpSize">---</span></p>
+<!-- SEÇÃO 5 -->
+<h2>5º — Tons de Cinza</h2>
+<div class="container">
+    <p>A imagem em tons de cinza aparecerá abaixo automaticamente.</p>
+    <img id="grayPreview">
+    <button id="downloadGray" disabled>Baixar Tons de Cinza</button>
+</div>
 
-        <img id="webpPreview" src="" alt="">
-
-        <button id="downloadWebp" style="
-            margin-top: 15px;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 8px;
-            background: #0e6b62;
-            color: white;
-            cursor: pointer;
-            font-weight: bold;
-        " disabled>Baixar WEBP</button>
-    </div>
-
-    <!-- Seção 4 -->
-    <h2>4º - Operação Geométrica — Espelhamento Vertical</h2>
-
-    <div class="container">
-        <p>A imagem espelhada aparecerá abaixo automaticamente.</p>
-
-        <img id="flipPreview" src="" alt="">
-
-        <button id="downloadFlip" style="
-            margin-top: 15px;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 8px;
-            background: #0e6b62;
-            color: white;
-            cursor: pointer;
-            font-weight: bold;
-        " disabled>Baixar Espelhamento</button>
-    </div>
-
-    <!-- Seção 5 -->
-    <h2>5º - Operação de Cores — Tons de Cinza</h2>
-
-    <div class="container">
-        <p>A imagem em tons de cinza aparecerá abaixo automaticamente.</p>
-
-        <img id="grayPreview" src="" alt="">
-
-        <button id="downloadGray" style="
-            margin-top: 15px;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 8px;
-            background: #0e6b62;
-            color: white;
-            cursor: pointer;
-            font-weight: bold;
-        " disabled>Baixar Tons de Cinza</button>
-    </div>
-
-    <!-- Seção 6 -->
-    <h2>6º - Histograma RGB + Estatísticas</h2>
-
-    <div class="container">
-        <p>Histogramas dos canais R, G e B e estatísticas calculadas automaticamente.</p>
-
-        <div style="display:flex; flex-wrap:wrap; gap:20px;">
-            <div>
-                <h3>Histograma R</h3>
-                <canvas id="histR" width="300" height="150" style="background:white;"></canvas>
-                <p id="statsR"></p>
-            </div>
-
-            <div>
-                <h3>Histograma G</h3>
-                <canvas id="histG" width="300" height="150" style="background:white;"></canvas>
-                <p id="statsG"></p>
-            </div>
-
-            <div>
-                <h3>Histograma B</h3>
-                <canvas id="histB" width="300" height="150" style="background:white;"></canvas>
-                <p id="statsB"></p>
-            </div>
+<!-- SEÇÃO 6 -->
+<h2>6º — Histogramas RGB + Estatísticas</h2>
+<div class="container">
+    <div style="display:flex; flex-wrap:wrap; gap:20px;">
+        <div>
+            <h3>Histograma R</h3>
+            <canvas id="histR" width="300" height="150"></canvas>
+            <p id="statsR"></p>
+        </div>
+        <div>
+            <h3>Histograma G</h3>
+            <canvas id="histG" width="300" height="150"></canvas>
+            <p id="statsG"></p>
+        </div>
+        <div>
+            <h3>Histograma B</h3>
+            <canvas id="histB" width="300" height="150"></canvas>
+            <p id="statsB"></p>
         </div>
     </div>
+</div>
 
-    <!-- Seção 7 -->
-    <h2>7º - Análise de Bits e Estrutura da Imagem</h2>
-
-    <div class="container">
-        <p>Informações sobre profundidade de cor, canais, dimensões e tamanho em memória.</p>
-
-        <p id="bitsInfo"></p>
-    </div>
+<!-- SEÇÃO 7 -->
+<h2>7º — Análise de Bits e Estrutura da Imagem</h2>
+<div class="container">
+    <p id="bitsInfo"></p>
+</div>
 
     <script>
         const input = document.getElementById("imageInput");
